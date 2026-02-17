@@ -1,0 +1,439 @@
+:root {
+  --navy: #1a3a6b;
+  --navy-dark: #0f2444;
+  --navy-light: #2a5090;
+  --gold: #c9a227;
+  --gold-light: #dbb94a;
+  --white: #ffffff;
+  --gray-100: #f5f5f7;
+  --gray-200: #e8e8ec;
+  --gray-400: #9a9aaa;
+  --gray-600: #555566;
+  --gray-800: #2a2a3a;
+  --bg: #0c1a2e;
+  --bg-card: #132240;
+  --radius: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--gray-100);
+  min-height: 100vh;
+}
+
+header {
+  background: var(--navy-dark);
+  border-bottom: 2px solid var(--gold);
+  padding: 1.25rem 2rem;
+}
+
+.brand h1 {
+  font-family: Didot, 'Times New Roman', serif;
+  font-size: 1.6rem;
+  letter-spacing: 6px;
+  color: var(--white);
+  font-weight: 700;
+}
+
+.brand .subtitle {
+  font-family: Futura, 'Trebuchet MS', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.step {
+  background: var(--bg-card);
+  border: 1px solid rgba(201, 162, 39, 0.15);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.step[hidden] { display: none; }
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--navy-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.step-header h2 {
+  font-family: Futura, 'Trebuchet MS', sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+  color: var(--white);
+}
+
+/* Drop zone */
+.drop-zone {
+  border: 2px dashed var(--gold);
+  border-radius: var(--radius);
+  padding: 3rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.drop-zone:hover, .drop-zone.drag-over {
+  background: rgba(201, 162, 39, 0.08);
+  border-color: var(--gold-light);
+}
+
+.drop-zone-content p {
+  margin: 0.5rem 0;
+  color: var(--gray-200);
+}
+
+.drop-zone-content .hint {
+  font-size: 0.8rem;
+  color: var(--gray-400);
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  text-decoration: none;
+  font-family: Futura, 'Trebuchet MS', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.btn:active { transform: scale(0.98); }
+
+.btn-primary {
+  background: var(--gold);
+  color: var(--navy-dark);
+}
+
+.btn-primary:hover { background: var(--gold-light); }
+.btn-primary:disabled { background: var(--gray-600); color: var(--gray-400); cursor: not-allowed; }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  margin-top: 0.75rem;
+}
+
+.btn-secondary:hover { background: rgba(201, 162, 39, 0.1); }
+
+.btn-large {
+  padding: 0.85rem 2.5rem;
+  font-size: 1rem;
+}
+
+/* Progress bar */
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--gray-800);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 1rem;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  font-size: 0.75rem;
+  color: var(--gray-400);
+}
+
+/* Info panel */
+.info-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(26, 58, 107, 0.3);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--gray-200);
+  line-height: 1.6;
+}
+
+.info-panel strong { color: var(--gold); }
+
+/* Status message */
+.status-message {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.status-message.loading {
+  background: rgba(201, 162, 39, 0.1);
+  color: var(--gold);
+}
+
+.status-message.error {
+  background: rgba(200, 50, 50, 0.15);
+  color: #e06060;
+}
+
+.status-message.success {
+  background: rgba(50, 180, 80, 0.12);
+  color: #60c070;
+}
+
+/* Analysis grid */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.analysis-field {
+  background: rgba(26, 58, 107, 0.25);
+  border: 1px solid rgba(201, 162, 39, 0.12);
+  border-radius: 6px;
+  padding: 0.75rem;
+}
+
+.analysis-field label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gold);
+  margin-bottom: 0.35rem;
+  font-family: Futura, 'Trebuchet MS', sans-serif;
+}
+
+.analysis-field input,
+.analysis-field textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(201, 162, 39, 0.2);
+  border-radius: 4px;
+  padding: 0.5rem;
+  color: var(--white);
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.analysis-field textarea { resize: vertical; min-height: 48px; }
+.analysis-field input:focus,
+.analysis-field textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+/* Timeline bar */
+.timeline-bar {
+  position: relative;
+  height: 60px;
+  background: var(--navy-dark);
+  border-radius: 6px;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(201, 162, 39, 0.15);
+}
+
+.timeline-intro {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--navy);
+  border-right: 2px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: var(--gold);
+  letter-spacing: 1px;
+  font-family: Futura, 'Trebuchet MS', sans-serif;
+}
+
+.timeline-callout {
+  position: absolute;
+  top: 8px;
+  height: calc(100% - 16px);
+  background: rgba(201, 162, 39, 0.2);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  font-size: 0.55rem;
+  color: var(--white);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+
+.timeline-callout:hover {
+  background: rgba(201, 162, 39, 0.35);
+}
+
+/* Callout editor */
+.callout-editor { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.callout-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(26, 58, 107, 0.2);
+  border-radius: 6px;
+  border-left: 3px solid var(--gold);
+}
+
+.callout-time {
+  font-size: 0.75rem;
+  color: var(--gold);
+  font-family: 'SF Mono', Menlo, monospace;
+  min-width: 36px;
+}
+
+.callout-row input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(201, 162, 39, 0.2);
+  border-radius: 4px;
+  padding: 0.45rem 0.6rem;
+  color: var(--white);
+  font-size: 0.85rem;
+}
+
+.callout-row input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+/* Music section */
+.music-section {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(201, 162, 39, 0.12);
+}
+
+.music-section h3 {
+  font-family: Futura, 'Trebuchet MS', sans-serif;
+  font-size: 0.9rem;
+  color: var(--white);
+  margin-bottom: 0.75rem;
+}
+
+.music-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--gray-200);
+  cursor: pointer;
+}
+
+.radio-label input[type="radio"] { accent-color: var(--gold); }
+
+.music-filename {
+  font-size: 0.8rem;
+  color: var(--gold);
+  font-style: italic;
+}
+
+/* Render progress stages */
+.progress-stages {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.stage {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stage-label {
+  font-size: 0.75rem;
+  color: var(--gray-400);
+  min-width: 80px;
+  font-family: Futura, 'Trebuchet MS', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.stage .progress-bar {
+  flex: 1;
+  margin-top: 0;
+  height: 5px;
+}
+
+/* Download section */
+#download-section {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+#download-link {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--navy-dark);
+}
+
+footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--gray-600);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .analysis-grid { grid-template-columns: 1fr; }
+  main { padding: 0 1rem; }
+  .drop-zone { padding: 2rem 1rem; }
+}
