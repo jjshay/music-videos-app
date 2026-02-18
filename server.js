@@ -7,6 +7,7 @@ const multer = require('multer');
 const uploadRoute = require('./src/routes/upload');
 const analyzeRoute = require('./src/routes/analyze');
 const renderRoute = require('./src/routes/render');
+const musicVideoRoute = require('./src/routes/music-video');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/upload', uploadRoute);
 app.use('/api/analyze', analyzeRoute);
 app.use('/api/render', renderRoute);
+app.use('/api/music-video', musicVideoRoute);
 
 // Download route
 app.get('/api/download/:jobId', (req, res) => {
