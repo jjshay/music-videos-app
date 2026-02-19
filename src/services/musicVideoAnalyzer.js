@@ -153,6 +153,16 @@ Analyze these frames and return a JSON object:
     "description": "<one sentence describing the vibe, e.g. 'Intimate acoustic performance with soft fingerpicking'>",
     "pexelsQuery": "<Pexels video search query for matching crowd footage>"
   },
+  "kenBurns": {
+    "artist": { "enabled": <bool — true for static/slow clips, false for dynamic/handheld>, "direction": "<in|out>" },
+    "guitar": { "enabled": <bool>, "direction": "in" },
+    "crowd": { "enabled": <bool>, "direction": "<in|out>" }
+  },
+  "colorGrade": {
+    "artist": { "brightness": <-0.1 to 0.1>, "contrast": <0.8 to 1.3>, "saturation": <0.8 to 1.3> },
+    "guitar": { "brightness": <number>, "contrast": <number>, "saturation": <number> },
+    "crowd": { "brightness": <number>, "contrast": <number>, "saturation": <number> }
+  },
   "segments": [
     {
       "clipType": "artist",
@@ -160,6 +170,8 @@ Analyze these frames and return a JSON object:
       "duration": <seconds for this segment>,
       "caption": "<bold TikTok-style caption, all caps, 2-6 words>",
       "captionReason": "<why>",
+      "captionAnimation": "<fade|slideUp|slideDown|fadeSlide|scaleBounce>",
+      "speedMultiplier": <0.7 to 1.3, 1.0 = normal>,
       "trimReason": "<why this start point — what's visually compelling>"
     },
     {
@@ -168,6 +180,8 @@ Analyze these frames and return a JSON object:
       "duration": <number>,
       "caption": "<caption about the guitar being sold, e.g. 'PLAY LIKE THE PROS', 'HANDCRAFTED TONE'>",
       "captionReason": "<why>",
+      "captionAnimation": "<fade|slideUp|slideDown|fadeSlide|scaleBounce>",
+      "speedMultiplier": <0.7 to 1.3>,
       "trimReason": "<why>"
     },
     {
@@ -176,6 +190,8 @@ Analyze these frames and return a JSON object:
       "duration": <number>,
       "caption": "<caption matching the energy, e.g. 'FEEL THE ENERGY' or 'PURE ACOUSTIC BLISS'>",
       "captionReason": "<why>",
+      "captionAnimation": "<fade|slideUp|slideDown|fadeSlide|scaleBounce>",
+      "speedMultiplier": <0.7 to 1.3>,
       "trimReason": "<why>"
     }
   ],
@@ -185,6 +201,11 @@ Analyze these frames and return a JSON object:
     { "from": "artist", "to": "guitar", "type": "<fade|dissolve|wipeleft|wiperight|slideup|slidedown|smoothleft|smoothright>", "reason": "<why>" },
     { "from": "guitar", "to": "crowd", "type": "<type from same set>", "reason": "<why>" }
   ],
+  "heroFrame": {
+    "clipType": "<artist|guitar|crowd — which clip has the best thumbnail moment>",
+    "timestamp": <seconds into that clip>,
+    "reason": "<why this is the most visually compelling moment>"
+  },
   "overallNotes": "<brief creative direction — mood, pacing, energy>",
   "suggestedArtistName": "<if visible in frames, otherwise null>",
   "guitarType": "<acoustic/electric/classical/bass — what type of guitar is being sold>",
@@ -210,7 +231,9 @@ RULES:
 - startTime + duration must not exceed clip length
 - Pick the MOST DYNAMIC start points
 - Artist clip: expressive playing, well-lit, good energy
-- Guitar clip: clear product shot, detail, spinning if available
+- CRITICAL AUDIO SYNC: The artist clip's audio is the soundtrack. When you pick startTime for the artist segment, the AUDIO will also start near that timestamp. So pick a startTime where BOTH the visual performance AND the song sound good — avoid starting mid-word or mid-phrase. Prefer beginnings of musical phrases or chorus entries.
+- Guitar clip: This is a SPINNING PRODUCT VIDEO. Pick startTime to show the FULL FRONT of the guitar first, then capture the rotation. The video displays in "fit" mode — the full frame is always visible with dark background padding. Pick the moment where the guitar face is most visible and well-lit.
+- Guitar clip speed: Consider using speedMultiplier 0.8-0.9 for the guitar segment to create a dramatic slow-motion reveal of the product.
 - Captions: bold, punchy, sell-the-guitar energy
 - guitarType: identify from the guitar close-up frames (acoustic, electric, classical, bass)
 - outro: CTA card at the end. line2 should reference the guitar type specifically:
@@ -221,14 +244,19 @@ RULES:
 - outro.line1: punchy CTA like "BROWSE THE FULL COLLECTION" or "SHOP SIGNED GUITARS" or "FIND YOUR SOUND"
 - Transitions: choose ONLY from the professional set: fade, dissolve, wipeleft, wiperight, slideup, slidedown, smoothleft, smoothright. Prefer fade/dissolve for mood changes; directional wipes when content flows in a direction.
 - outro.line3: always "GAUNTLET GALLERY"
-- outro.line4: optional short tagline (or empty string)${!hasCrowdAlready ? '\n- No crowd clip uploaded yet — we will fetch from Pexels using your pexelsQuery. Use startTime: 0 and duration: 10 for crowd.' : ''}
+- outro.line4: optional short tagline (or empty string)
+- kenBurns: enable for static/slow clips (tripod shots, product displays), disable for dynamic/handheld footage. Direction "in" zooms closer, "out" reveals more.
+- colorGrade: suggest adjustments so all clips match in brightness/tone. Keep values subtle (brightness -0.05 to 0.05, contrast 0.9-1.15, saturation 0.9-1.2). Goal is visual consistency across all three clips.
+- speedMultiplier: range 0.7-1.3. Use slow-mo (<1.0) for dramatic reveals or emotional moments. Speed up (>1.0) for high-energy sequences. Use 1.0 for most clips.
+- captionAnimation: match the energy of each segment. Use "fadeSlide" for most segments, "scaleBounce" for high-energy moments, "fade" for mellow/acoustic, "slideUp" or "slideDown" for transitional feels.
+- heroFrame: pick the single most visually compelling moment across ALL clips for a thumbnail. Prefer well-lit, clear shots with the artist or guitar visible. Provide the timestamp within that clip.${!hasCrowdAlready ? '\n- No crowd clip uploaded yet — we will fetch from Pexels using your pexelsQuery. Use startTime: 0 and duration: 10 for crowd.' : ''}
 
 Return ONLY the JSON object, no markdown.`,
   };
 
   const response = await getClient().messages.create({
     model: 'claude-sonnet-4-20250514',
-    max_tokens: 2048,
+    max_tokens: 3072,
     messages: [
       {
         role: 'user',

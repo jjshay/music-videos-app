@@ -3,31 +3,31 @@
   let videoInfo = null;
   let timeline = null;
 
-  // DOM refs
-  const dropZone = document.getElementById('drop-zone');
-  const fileInput = document.getElementById('file-input');
-  const btnBrowse = document.getElementById('btn-browse');
-  const uploadProgress = document.getElementById('upload-progress');
-  const videoInfoPanel = document.getElementById('video-info');
+  // DOM refs (art- prefixed IDs for unified tabbed page)
+  const dropZone = document.getElementById('art-drop-zone');
+  const fileInput = document.getElementById('art-file-input');
+  const btnBrowse = document.getElementById('art-btn-browse');
+  const uploadProgress = document.getElementById('art-upload-progress');
+  const videoInfoPanel = document.getElementById('art-video-info');
 
-  const stepAnalyze = document.getElementById('step-analyze');
-  const btnAnalyze = document.getElementById('btn-analyze');
-  const analyzeStatus = document.getElementById('analyze-status');
-  const analysisResults = document.getElementById('analysis-results');
-  const analysisFields = document.getElementById('analysis-fields');
+  const stepAnalyze = document.getElementById('art-step-analyze');
+  const btnAnalyze = document.getElementById('art-btn-analyze');
+  const analyzeStatus = document.getElementById('art-analyze-status');
+  const analysisResults = document.getElementById('art-analysis-results');
+  const analysisFields = document.getElementById('art-analysis-fields');
 
-  const stepTimeline = document.getElementById('step-timeline');
-  const timelineBar = document.getElementById('timeline-bar');
-  const calloutEditor = document.getElementById('callout-editor');
-  const musicInput = document.getElementById('music-input');
-  const musicFilename = document.getElementById('music-filename');
+  const stepTimeline = document.getElementById('art-step-timeline');
+  const timelineBar = document.getElementById('art-timeline-bar');
+  const calloutEditor = document.getElementById('art-callout-editor');
+  const musicInput = document.getElementById('art-music-input');
+  const musicFilename = document.getElementById('art-music-filename');
 
-  const stepRender = document.getElementById('step-render');
-  const btnRender = document.getElementById('btn-render');
-  const renderProgress = document.getElementById('render-progress');
-  const renderStatusText = document.getElementById('render-status-text');
-  const downloadSection = document.getElementById('download-section');
-  const downloadLink = document.getElementById('download-link');
+  const stepRender = document.getElementById('art-step-render');
+  const btnRender = document.getElementById('art-btn-render');
+  const renderProgress = document.getElementById('art-render-progress');
+  const renderStatusText = document.getElementById('art-render-status-text');
+  const downloadSection = document.getElementById('art-download-section');
+  const downloadLink = document.getElementById('art-download-link');
 
   // Drag and drop
   dropZone.addEventListener('dragover', (e) => {
@@ -207,7 +207,7 @@
   }
 
   // Music
-  document.querySelectorAll('input[name="music"]').forEach((radio) => {
+  document.querySelectorAll('input[name="art-music"]').forEach((radio) => {
     radio.addEventListener('change', () => {
       if (radio.value === 'custom') {
         musicInput.click();
@@ -285,7 +285,8 @@
 
   function handleRenderEvent(event, data) {
     if (event === 'progress') {
-      const stageEl = document.querySelector(`#stage-${data.stage} .progress-fill`);
+      // Art video stages use art- prefix
+      const stageEl = document.querySelector(`#art-stage-${data.stage} .progress-fill`);
       if (stageEl) stageEl.style.width = data.percent + '%';
       renderStatusText.className = 'status-message loading';
       renderStatusText.textContent = data.message;

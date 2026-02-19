@@ -208,4 +208,72 @@ async function renderOutroCard(outputDir, width, height, outroText) {
   return outputFile;
 }
 
-module.exports = { renderCaption, renderAllCaptions, renderIntroCard, renderOutroCard };
+/**
+ * Render a branded thumbnail by compositing a hero frame with
+ * a gradient overlay and branded text (artist name + GAUNTLET GALLERY).
+ *
+ * @param {string} frameFile - Path to hero frame image (jpg/png)
+ * @param {string} outputFile - Output thumbnail path
+ * @param {string} artistName - Artist name for overlay text
+ * @param {string} guitarType - Guitar type (acoustic, electric, etc.)
+ * @param {number} w - Output width (default 1080)
+ * @param {number} h - Output height (default 1920)
+ */
+async function renderBrandedThumbnail(frameFile, outputFile, artistName, guitarType, w = 1080, h = 1920) {
+  const { colors, fonts } = brand;
+
+  // Load and resize the hero frame
+  const frame = sharp(frameFile).resize(w, h, { fit: 'cover', position: 'centre' });
+  const frameBuffer = await frame.toBuffer();
+
+  // Create gradient overlay SVG (dark gradient at bottom for text readability)
+  const titleFontSize = Math.round(w * 0.065);
+  const subtitleFontSize = Math.round(w * 0.035);
+  const brandFontSize = Math.round(w * 0.028);
+  const centerX = Math.round(w / 2);
+  const textY = Math.round(h * 0.85);
+
+  const displayName = (artistName || 'LIVE PERFORMANCE').toUpperCase();
+  const displayType = (guitarType || 'GUITAR').toUpperCase();
+
+  const overlaySvg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="transparent"/>
+        <stop offset="50%" stop-color="transparent"/>
+        <stop offset="75%" stop-color="rgba(0,0,0,0.5)"/>
+        <stop offset="100%" stop-color="rgba(0,0,0,0.85)"/>
+      </linearGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#grad)"/>
+    <text x="${centerX}" y="${textY}" text-anchor="middle"
+          font-family="${fonts.heading}, serif" font-size="${titleFontSize}" font-weight="bold"
+          fill="${colors.white}" letter-spacing="3">
+      <tspan fill="none" stroke="#000" stroke-width="4" stroke-linejoin="round">${escapeXml(displayName)}</tspan>
+    </text>
+    <text x="${centerX}" y="${textY}" text-anchor="middle"
+          font-family="${fonts.heading}, serif" font-size="${titleFontSize}" font-weight="bold"
+          fill="${colors.white}" letter-spacing="3">${escapeXml(displayName)}</text>
+    <text x="${centerX}" y="${textY + Math.round(titleFontSize * 1.2)}" text-anchor="middle"
+          font-family="${fonts.body}, sans-serif" font-size="${subtitleFontSize}"
+          fill="${colors.gold}" letter-spacing="4">${escapeXml(displayType)}</text>
+    <line x1="${centerX - Math.round(w * 0.2)}" y1="${textY + Math.round(titleFontSize * 1.7)}"
+          x2="${centerX + Math.round(w * 0.2)}" y2="${textY + Math.round(titleFontSize * 1.7)}"
+          stroke="${colors.gold}" stroke-width="2"/>
+    <text x="${centerX}" y="${textY + Math.round(titleFontSize * 2.3)}" text-anchor="middle"
+          font-family="${fonts.body}, sans-serif" font-size="${brandFontSize}"
+          fill="${colors.gold}" letter-spacing="6">GAUNTLET GALLERY</text>
+  </svg>`;
+
+  const overlayBuffer = await sharp(Buffer.from(overlaySvg)).png().toBuffer();
+
+  // Composite: hero frame + gradient/text overlay
+  await sharp(frameBuffer)
+    .composite([{ input: overlayBuffer, top: 0, left: 0 }])
+    .jpeg({ quality: 92 })
+    .toFile(outputFile);
+
+  return outputFile;
+}
+
+module.exports = { renderCaption, renderAllCaptions, renderIntroCard, renderOutroCard, renderBrandedThumbnail };

@@ -3,118 +3,1063 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gauntlet Gallery — Video Overlay Tool</title>
+  <title>Gauntlet Gallery — Video Tools</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* === Tab navigation === */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      max-width: 900px;
+      margin: 1.5rem auto 0;
+      padding: 0 1.5rem;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 0.85rem 1.5rem;
+      background: var(--navy-dark);
+      border: 1px solid rgba(201, 162, 39, 0.15);
+      border-bottom: none;
+      color: var(--gray-400);
+      font-family: Futura, 'Trebuchet MS', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      text-align: center;
+    }
+    .tab-btn:first-child { border-radius: var(--radius) 0 0 0; }
+    .tab-btn:last-child { border-radius: 0 var(--radius) 0 0; }
+    .tab-btn:hover { background: rgba(201, 162, 39, 0.06); color: var(--gray-200); }
+    .tab-btn.active {
+      background: var(--bg-card);
+      color: var(--gold);
+      border-color: rgba(201, 162, 39, 0.3);
+      border-bottom: 2px solid var(--bg-card);
+      margin-bottom: -1px;
+      position: relative;
+      z-index: 1;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* === Music Video specific styles === */
+    .drop-zones-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .drop-zones-grid .drop-zone {
+      padding: 1.5rem 1rem;
+    }
+    .drop-zones-grid .drop-zone svg {
+      width: 36px;
+      height: 36px;
+    }
+    .drop-zone-label {
+      font-family: Futura, 'Trebuchet MS', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .drop-zone .file-name {
+      font-size: 0.75rem;
+      color: var(--gold-light);
+      margin-top: 0.5rem;
+      word-break: break-all;
+    }
+    .drop-zone.has-file {
+      border-style: solid;
+      background: rgba(201, 162, 39, 0.06);
+    }
+    .config-form {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .form-group {
+      flex: 1;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gold);
+      margin-bottom: 0.35rem;
+      font-family: Futura, 'Trebuchet MS', sans-serif;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(201, 162, 39, 0.2);
+      border-radius: 4px;
+      padding: 0.5rem;
+      color: var(--white);
+      font-size: 0.85rem;
+      font-family: inherit;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    /* AI analysis results */
+    .ai-notes {
+      background: rgba(26, 58, 107, 0.3);
+      border: 1px solid rgba(201, 162, 39, 0.15);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-size: 0.82rem;
+      color: var(--gray-200);
+      line-height: 1.6;
+    }
+    .ai-notes strong { color: var(--gold); }
+    .ai-reason {
+      font-size: 0.72rem;
+      color: var(--gray-400);
+      font-style: italic;
+      margin-top: 0.25rem;
+    }
+    .segment-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .seg-row {
+      display: grid;
+      grid-template-columns: auto 1fr 80px 80px 120px;
+      gap: 0.6rem;
+      align-items: center;
+      padding: 0.65rem 0.75rem;
+      background: rgba(26, 58, 107, 0.2);
+      border-radius: 6px 6px 0 0;
+      border-left: 3px solid var(--gold);
+    }
+    .seg-effects {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 0.4rem 0.75rem 0.5rem 0.75rem;
+      background: rgba(26, 58, 107, 0.12);
+      border-radius: 0 0 6px 6px;
+      border-left: 3px solid rgba(201,162,39,0.3);
+      margin-bottom: 0.25rem;
+    }
+    .seg-effects label {
+      font-size: 0.68rem;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .seg-effects select, .seg-effects input[type="range"] {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(201, 162, 39, 0.15);
+      border-radius: 4px;
+      padding: 0.2rem 0.35rem;
+      color: var(--white);
+      font-size: 0.72rem;
+      font-family: inherit;
+    }
+    .seg-effects input[type="range"] {
+      width: 80px;
+      accent-color: var(--gold);
+    }
+    .seg-effects input[type="checkbox"] {
+      accent-color: var(--gold);
+    }
+    .seg-label {
+      font-size: 0.7rem;
+      font-family: Futura, 'Trebuchet MS', sans-serif;
+      letter-spacing: 1px;
+      color: var(--gold);
+      text-transform: uppercase;
+      min-width: 60px;
+    }
+    .seg-row input, .seg-row select {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(201, 162, 39, 0.2);
+      border-radius: 4px;
+      padding: 0.4rem 0.5rem;
+      color: var(--white);
+      font-size: 0.82rem;
+      font-family: inherit;
+    }
+    .seg-row input:focus, .seg-row select:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .seg-row input[type="number"] {
+      text-align: center;
+    }
+    .transition-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.4rem 0.75rem 0.4rem 2rem;
+      font-size: 0.75rem;
+      color: var(--gray-400);
+    }
+    .transition-row select {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(201, 162, 39, 0.15);
+      border-radius: 4px;
+      padding: 0.3rem 0.5rem;
+      color: var(--white);
+      font-size: 0.75rem;
+      font-family: inherit;
+    }
+    .transition-row select:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .duration-total {
+      font-size: 0.8rem;
+      color: var(--gray-400);
+      margin-top: 0.5rem;
+      font-family: 'SF Mono', Menlo, monospace;
+    }
+    .duration-total.over { color: #e06060; }
+    .duration-total.ok { color: #60c070; }
+
+    .outro-editor {
+      margin-top: 0.5rem;
+    }
+    .outro-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    /* YouTube source toggle */
+    .clip-source-container {
+      display: flex;
+      flex-direction: column;
+    }
+    .source-toggle {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .source-toggle label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-400);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: Futura, 'Trebuchet MS', sans-serif;
+    }
+    .source-toggle input[type="radio"] {
+      accent-color: var(--gold);
+    }
+    .source-toggle input[type="radio"]:checked + span {
+      color: var(--gold);
+    }
+    .yt-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 1rem;
+      border: 1px dashed rgba(201, 162, 39, 0.3);
+      border-radius: 8px;
+      background: rgba(26, 58, 107, 0.15);
+    }
+    .yt-input-group input[type="text"],
+    .yt-input-group input[type="number"] {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(201, 162, 39, 0.2);
+      border-radius: 4px;
+      padding: 0.5rem;
+      color: var(--white);
+      font-size: 0.85rem;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .yt-input-group input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .yt-input-group .yt-url {
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 0.8rem;
+    }
+    .yt-time-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .yt-time-row .form-group {
+      flex: 1;
+    }
+    .yt-time-row label {
+      display: block;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-400);
+      margin-bottom: 0.25rem;
+      font-family: Futura, 'Trebuchet MS', sans-serif;
+    }
+    .yt-status {
+      font-size: 0.75rem;
+      color: var(--gray-400);
+      min-height: 1.1em;
+    }
+    .yt-status.downloading { color: var(--gold-light); }
+    .yt-status.ready { color: #60c070; }
+    .yt-status.error { color: #e06060; }
+
+    /* === Product Video Generator (scoped to #tab-product) === */
+    #tab-product .pv-upload-area {
+      border: 2px dashed var(--gold);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      color: var(--gray-200);
+    }
+    #tab-product .pv-upload-area:hover,
+    #tab-product .pv-upload-area.dragover {
+      background: rgba(201, 162, 39, 0.08);
+      border-color: var(--gold-light);
+    }
+    #tab-product .pv-upload-area p { margin: 0.5rem 0; }
+    #tab-product .pv-upload-area .hint { font-size: 0.8rem; color: var(--gray-400); }
+    #tab-product .pv-image-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 1rem;
+    }
+    #tab-product .pv-preview-item {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(201, 162, 39, 0.2);
+      cursor: move;
+      transition: transform 0.2s;
+    }
+    #tab-product .pv-preview-item.dragging { opacity: 0.5; transform: scale(1.05); }
+    #tab-product .pv-preview-item.drag-over { border: 2px solid var(--gold); }
+    #tab-product .pv-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    #tab-product .pv-preview-item .pv-remove-btn {
+      position: absolute; top: 4px; right: 4px;
+      background: rgba(0,0,0,0.7); border: none; border-radius: 50%;
+      width: 22px; height: 22px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #e06060; z-index: 10;
+    }
+    #tab-product .pv-preview-item .pv-remove-btn:hover { background: #e06060; color: #fff; }
+    #tab-product .pv-preview-item .pv-drag-handle {
+      position: absolute; top: 4px; left: 4px;
+      background: rgba(0,0,0,0.7); border: none; border-radius: 50%;
+      width: 22px; height: 22px; cursor: move;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--gold); z-index: 10;
+    }
+    #tab-product .pv-preview-item .pv-image-number {
+      position: absolute; bottom: 4px; left: 4px;
+      background: rgba(0,0,0,0.7); color: #fff; border-radius: 50%;
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+    }
+    #tab-product .pv-settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+    #tab-product .pv-setting-group { display: flex; flex-direction: column; }
+    #tab-product .pv-setting-group label {
+      font-size: 0.7rem; font-weight: 600; color: var(--gold);
+      margin-bottom: 0.35rem; text-transform: uppercase;
+      letter-spacing: 0.5px; font-family: Futura, 'Trebuchet MS', sans-serif;
+    }
+    #tab-product .pv-setting-group select,
+    #tab-product .pv-setting-group input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(201, 162, 39, 0.2);
+      border-radius: 4px;
+      padding: 0.5rem;
+      color: var(--white);
+      font-size: 0.85rem;
+      font-family: inherit;
+    }
+    #tab-product .pv-setting-group select:focus,
+    #tab-product .pv-setting-group input:focus {
+      outline: none; border-color: var(--gold);
+    }
+    #tab-product .pv-setting-group .pv-help-text {
+      font-size: 0.72rem; color: var(--gray-400); margin-top: 0.25rem;
+    }
+    #tab-product .pv-button-group {
+      display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;
+    }
+    #tab-product .pv-progress-section { text-align: center; padding: 0; }
+    #tab-product .pv-progress-bar {
+      width: 100%; height: 24px; background: var(--gray-800);
+      border-radius: 12px; overflow: hidden; margin: 1rem 0;
+    }
+    #tab-product .pv-progress-fill {
+      height: 100%; background: var(--gold); transition: width 0.3s;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--navy-dark); font-weight: 700; font-size: 0.8rem;
+    }
+    #tab-product .pv-status-message {
+      padding: 0.75rem 1rem; border-radius: 6px; margin: 0.75rem 0;
+      display: none; font-size: 0.85rem;
+    }
+    #tab-product .pv-status-success { background: rgba(50,180,80,0.12); color: #60c070; }
+    #tab-product .pv-status-error { background: rgba(200,50,50,0.15); color: #e06060; }
+    #tab-product .pv-status-info { background: rgba(201,162,39,0.1); color: var(--gold); }
+    #tab-product .pv-video-preview-section { display: none; }
+    #tab-product #pv-videoCanvas { display: none; }
+
+    @media (max-width: 640px) {
+      .drop-zones-grid { grid-template-columns: 1fr; }
+      .form-row { flex-direction: column; }
+      .outro-fields { grid-template-columns: 1fr; }
+      .yt-time-row { flex-direction: column; }
+      .tab-btn { font-size: 0.7rem; letter-spacing: 1px; padding: 0.7rem 0.75rem; }
+      #tab-product .pv-settings-grid { grid-template-columns: 1fr; }
+      #tab-product .pv-button-group { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
   <header>
     <div class="brand">
-      <a href="/music-video.html" style="float:right; font-size:0.8rem; color:#c9a227; text-decoration:none; font-family:Futura,'Trebuchet MS',sans-serif; letter-spacing:1px;">Music Video Creator</a>
       <h1>GAUNTLET GALLERY</h1>
-      <span class="subtitle">Video Overlay Tool</span>
+      <span class="subtitle">Video Tools</span>
     </div>
   </header>
 
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="music">Music Videos</button>
+    <button class="tab-btn" data-tab="art">Art Videos</button>
+    <button class="tab-btn" data-tab="product">Product Videos</button>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- TAB 1: MUSIC VIDEO CREATOR                                    -->
+  <!-- ============================================================ -->
   <main>
-    <!-- Step 1: Upload -->
-    <section id="step-upload" class="step active">
-      <div class="step-header">
-        <span class="step-number">1</span>
-        <h2>Upload Video</h2>
-      </div>
-      <div id="drop-zone" class="drop-zone">
-        <div class="drop-zone-content">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.5">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-          <p>Drag & drop your video here</p>
-          <p class="hint">MOV, MP4, M4V — up to 2 GB</p>
-          <button id="btn-browse" class="btn btn-secondary">Browse Files</button>
-          <input type="file" id="file-input" accept=".mov,.mp4,.m4v,.avi" hidden>
+    <div id="tab-music" class="tab-panel active">
+
+      <!-- Step 1: Upload -->
+      <section id="step-upload" class="step active">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h2>Upload Clips</h2>
         </div>
+
+        <div class="drop-zones-grid">
+          <!-- Artist clip: file upload or YouTube URL -->
+          <div class="clip-source-container" data-clip="artist">
+            <div class="source-toggle">
+              <label><input type="radio" name="artist-source" value="file" checked><span>Upload File</span></label>
+              <label><input type="radio" name="artist-source" value="youtube"><span>YouTube URL</span></label>
+            </div>
+            <div class="file-mode">
+              <div id="drop-artist" class="drop-zone" data-field="artistClip">
+                <div class="drop-zone-content">
+                  <div class="drop-zone-label">Artist Performance</div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.5">
+                    <path d="M15 10l4.553-2.276A1 1 0 0 1 21 8.618v6.764a1 1 0 0 1-1.447.894L15 14M5 18h8a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2z"/>
+                  </svg>
+                  <p class="hint">MOV / MP4 (with audio)</p>
+                  <p class="hint" style="color:var(--gold); font-size:0.7rem;">Audio becomes the soundtrack</p>
+                  <span class="file-name"></span>
+                </div>
+                <input type="file" accept=".mov,.mp4,.m4v,.avi" hidden>
+              </div>
+            </div>
+            <div class="youtube-mode" hidden>
+              <div class="yt-input-group">
+                <div class="drop-zone-label">Artist Performance — YouTube</div>
+                <input type="text" class="yt-url" placeholder="https://youtube.com/watch?v=..." data-clip="artist">
+                <div class="yt-time-row">
+                  <div class="form-group">
+                    <label>Start (sec)</label>
+                    <input type="number" class="yt-start" min="0" step="1" placeholder="0" data-clip="artist">
+                  </div>
+                  <div class="form-group">
+                    <label>End (sec)</label>
+                    <input type="number" class="yt-end" min="0" step="1" placeholder="e.g. 40" data-clip="artist">
+                  </div>
+                </div>
+                <p class="hint" style="color:var(--gold); font-size:0.7rem;">Audio becomes the soundtrack</p>
+                <div class="yt-status" data-clip="artist"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Guitar clip: file upload or YouTube URL -->
+          <div class="clip-source-container" data-clip="guitar">
+            <div class="source-toggle">
+              <label><input type="radio" name="guitar-source" value="file" checked><span>Upload File</span></label>
+              <label><input type="radio" name="guitar-source" value="youtube"><span>YouTube URL</span></label>
+            </div>
+            <div class="file-mode">
+              <div id="drop-guitar" class="drop-zone" data-field="guitarClip">
+                <div class="drop-zone-content">
+                  <div class="drop-zone-label">Guitar Close-Up</div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.5">
+                    <path d="M15 10l4.553-2.276A1 1 0 0 1 21 8.618v6.764a1 1 0 0 1-1.447.894L15 14M5 18h8a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2z"/>
+                  </svg>
+                  <p class="hint">MOV / MP4</p>
+                  <span class="file-name"></span>
+                </div>
+                <input type="file" accept=".mov,.mp4,.m4v,.avi" hidden>
+              </div>
+            </div>
+            <div class="youtube-mode" hidden>
+              <div class="yt-input-group">
+                <div class="drop-zone-label">Guitar Close-Up — YouTube</div>
+                <input type="text" class="yt-url" placeholder="https://youtube.com/watch?v=..." data-clip="guitar">
+                <div class="yt-time-row">
+                  <div class="form-group">
+                    <label>Start (sec)</label>
+                    <input type="number" class="yt-start" min="0" step="1" placeholder="0" data-clip="guitar">
+                  </div>
+                  <div class="form-group">
+                    <label>End (sec)</label>
+                    <input type="number" class="yt-end" min="0" step="1" placeholder="e.g. 40" data-clip="guitar">
+                  </div>
+                </div>
+                <div class="yt-status" data-clip="guitar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Optional crowd clip -->
+        <div style="margin-top: 1rem;">
+          <label class="radio-label">
+            <input type="checkbox" id="use-custom-crowd" style="accent-color: var(--gold);">
+            <span>Upload my own crowd footage (instead of Pexels auto-fetch)</span>
+          </label>
+          <div id="crowd-upload-area" hidden style="margin-top: 0.75rem;">
+            <div id="drop-crowd" class="drop-zone" data-field="crowdClip" style="padding: 1.5rem;">
+              <div class="drop-zone-content">
+                <div class="drop-zone-label">Crowd / Audience Clip</div>
+                <p class="hint">MOV / MP4</p>
+                <span class="file-name"></span>
+              </div>
+              <input type="file" accept=".mov,.mp4,.m4v,.avi" hidden>
+            </div>
+          </div>
+        </div>
+
+        <!-- Artist name -->
+        <div class="config-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Artist Name</label>
+              <input type="text" id="artist-name" placeholder="e.g. JJ Shay">
+            </div>
+          </div>
+        </div>
+
         <div id="upload-progress" class="progress-bar" hidden>
           <div class="progress-fill"></div>
           <span class="progress-text">Uploading...</span>
         </div>
-      </div>
-      <div id="video-info" class="info-panel" hidden></div>
-    </section>
+        <div id="upload-status" class="status-message" hidden></div>
 
-    <!-- Step 2: Analyze -->
-    <section id="step-analyze" class="step" hidden>
-      <div class="step-header">
-        <span class="step-number">2</span>
-        <h2>AI Analysis</h2>
-      </div>
-      <button id="btn-analyze" class="btn btn-primary">Analyze with Claude Vision</button>
-      <div id="analyze-status" class="status-message" hidden></div>
-      <div id="analysis-results" hidden>
-        <h3>Artwork Analysis</h3>
-        <div class="analysis-grid" id="analysis-fields"></div>
-      </div>
-    </section>
+        <button id="btn-upload" class="btn btn-primary btn-large" style="margin-top: 1.25rem;" disabled>
+          Upload & Analyze with AI
+        </button>
+      </section>
 
-    <!-- Step 3: Timeline -->
-    <section id="step-timeline" class="step" hidden>
-      <div class="step-header">
-        <span class="step-number">3</span>
-        <h2>Overlay Timeline</h2>
-      </div>
-      <div id="timeline-bar" class="timeline-bar"></div>
-      <div id="callout-editor" class="callout-editor"></div>
-      <div class="music-section">
-        <h3>Background Music</h3>
-        <div class="music-controls">
-          <label class="radio-label">
-            <input type="radio" name="music" value="default" checked>
-            <span>Luxury of Wisdom — DJ Ronaldo</span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="music" value="custom">
-            <span>Upload custom track</span>
-          </label>
-          <input type="file" id="music-input" accept=".mp3,.wav,.m4a" hidden>
-          <span id="music-filename" class="music-filename"></span>
+      <!-- Step 2: AI Analysis + Edit -->
+      <section id="step-analyze" class="step" hidden>
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <h2>AI Editor — Review & Adjust</h2>
         </div>
-      </div>
-    </section>
 
-    <!-- Step 4: Render -->
-    <section id="step-render" class="step" hidden>
-      <div class="step-header">
-        <span class="step-number">4</span>
-        <h2>Render</h2>
-      </div>
-      <button id="btn-render" class="btn btn-primary btn-large">Render Final Video</button>
-      <div id="render-progress" hidden>
-        <div class="progress-stages">
-          <div class="stage" id="stage-overlays">
-            <span class="stage-label">Overlays</span>
-            <div class="progress-bar"><div class="progress-fill"></div></div>
-          </div>
-          <div class="stage" id="stage-intro">
-            <span class="stage-label">Intro</span>
-            <div class="progress-bar"><div class="progress-fill"></div></div>
-          </div>
-          <div class="stage" id="stage-composite">
-            <span class="stage-label">Composite</span>
-            <div class="progress-bar"><div class="progress-fill"></div></div>
+        <div id="analyze-status" class="status-message" hidden></div>
+        <div id="ai-notes" class="ai-notes" hidden></div>
+        <div id="segment-editor" class="segment-editor" hidden></div>
+
+        <!-- Outro CTA card editor -->
+        <div id="outro-editor" class="outro-editor" hidden>
+          <div class="drop-zone-label" style="margin-top: 1.25rem;">Outro CTA Card</div>
+          <div class="outro-fields">
+            <div class="form-group">
+              <label>Line 1 — Call to Action</label>
+              <input type="text" id="outro-line1" value="SEE MORE GUITARS" placeholder="e.g. SEE MORE GUITARS">
+            </div>
+            <div class="form-group">
+              <label>Line 2 — Guitar Type</label>
+              <input type="text" id="outro-line2" value="SEE MORE SIGNED MUSICAL ITEMS" placeholder="e.g. SEE MORE SIGNED MUSICAL ITEMS">
+            </div>
+            <div class="form-group">
+              <label>Line 3 — Brand</label>
+              <input type="text" id="outro-line3" value="GAUNTLET GALLERY" placeholder="GAUNTLET GALLERY">
+            </div>
+            <div class="form-group">
+              <label>Line 4 — Tagline (optional)</label>
+              <input type="text" id="outro-line4" value="" placeholder="e.g. gauntletgallery.com">
+            </div>
           </div>
         </div>
-        <p id="render-status-text" class="status-message"></p>
-      </div>
-      <div id="download-section" hidden>
-        <a id="download-link" class="btn btn-primary btn-large" download>Download Final Video</a>
-      </div>
-    </section>
+
+        <div id="duration-total" class="duration-total" hidden></div>
+
+        <!-- Export format checkboxes -->
+        <div id="export-options" hidden style="margin-top: 1rem;">
+          <div class="drop-zone-label">Export Formats</div>
+          <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem;">
+            <label class="radio-label">
+              <input type="checkbox" value="9:16" checked disabled style="accent-color: var(--gold);">
+              <span>9:16 Vertical</span>
+            </label>
+            <label class="radio-label">
+              <input type="checkbox" id="export-1x1" value="1:1" style="accent-color: var(--gold);">
+              <span>1:1 Square</span>
+            </label>
+            <label class="radio-label">
+              <input type="checkbox" id="export-16x9" value="16:9" style="accent-color: var(--gold);">
+              <span>16:9 Landscape</span>
+            </label>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.25rem;">
+          <button id="btn-preview" class="btn btn-large" style="background: rgba(201,162,39,0.15); color: var(--gold); border: 1px solid rgba(201,162,39,0.3);" hidden>
+            Quick Preview
+          </button>
+          <button id="btn-render" class="btn btn-primary btn-large" hidden>
+            Create Music Video
+          </button>
+        </div>
+      </section>
+
+      <!-- Preview section -->
+      <section id="step-preview" class="step" hidden>
+        <div class="step-header">
+          <span class="step-number">&bull;</span>
+          <h2>Quick Preview</h2>
+        </div>
+        <div id="preview-progress" class="progress-stages" hidden>
+          <div class="stage" id="stage-preview">
+            <span class="stage-label">Preview</span>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+          </div>
+        </div>
+        <p id="preview-status-text" class="status-message" hidden></p>
+        <div id="preview-player-container" hidden style="margin-top: 1rem; text-align: center;">
+          <video id="preview-player" controls style="max-width: 100%; max-height: 400px; border-radius: 8px; border: 1px solid rgba(201,162,39,0.2);"></video>
+        </div>
+      </section>
+
+      <!-- Step 3: Render -->
+      <section id="step-render" class="step" hidden>
+        <div class="step-header">
+          <span class="step-number">3</span>
+          <h2>Rendering</h2>
+        </div>
+
+        <div id="render-progress">
+          <div class="progress-stages">
+            <div class="stage" id="stage-trim">
+              <span class="stage-label">Trim</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+            <div class="stage" id="stage-beats">
+              <span class="stage-label">Beats</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+            <div class="stage" id="stage-concat">
+              <span class="stage-label">Concat</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+            <div class="stage" id="stage-review">
+              <span class="stage-label">AI Review</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+            <div class="stage" id="stage-captions">
+              <span class="stage-label">Captions</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+            <div class="stage" id="stage-composite">
+              <span class="stage-label">Composite</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+            <div class="stage" id="stage-thumbnail">
+              <span class="stage-label">Thumbnail</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+            <div class="stage" id="stage-export">
+              <span class="stage-label">Export</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+          </div>
+          <p id="render-status-text" class="status-message"></p>
+        </div>
+
+        <div id="download-section" hidden style="margin-top: 1.5rem; text-align: center;">
+          <div id="download-links" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center;">
+            <a id="download-link" class="btn btn-primary btn-large" download>Download 9:16</a>
+          </div>
+          <div id="thumbnail-section" hidden style="margin-top: 1.25rem;">
+            <div class="drop-zone-label">Branded Thumbnail</div>
+            <img id="thumbnail-preview" style="max-width: 200px; border-radius: 8px; margin-top: 0.5rem; border: 1px solid rgba(201,162,39,0.2);" alt="Thumbnail">
+            <br>
+            <a id="thumbnail-download" class="btn" style="margin-top: 0.5rem; font-size: 0.8rem; background: rgba(201,162,39,0.15); color: var(--gold); border: 1px solid rgba(201,162,39,0.3);" download>Download Thumbnail</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB 2: ART VIDEO OVERLAY TOOL                                -->
+    <!-- ============================================================ -->
+    <div id="tab-art" class="tab-panel">
+
+      <!-- Step 1: Upload -->
+      <section id="art-step-upload" class="step active">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h2>Upload Video</h2>
+        </div>
+        <div id="art-drop-zone" class="drop-zone">
+          <div class="drop-zone-content">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p>Drag & drop your video here</p>
+            <p class="hint">MOV, MP4, M4V — up to 2 GB</p>
+            <button id="art-btn-browse" class="btn btn-secondary">Browse Files</button>
+            <input type="file" id="art-file-input" accept=".mov,.mp4,.m4v,.avi" hidden>
+          </div>
+          <div id="art-upload-progress" class="progress-bar" hidden>
+            <div class="progress-fill"></div>
+            <span class="progress-text">Uploading...</span>
+          </div>
+        </div>
+        <div id="art-video-info" class="info-panel" hidden></div>
+      </section>
+
+      <!-- Step 2: Analyze -->
+      <section id="art-step-analyze" class="step" hidden>
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <h2>AI Analysis</h2>
+        </div>
+        <button id="art-btn-analyze" class="btn btn-primary">Analyze with Claude Vision</button>
+        <div id="art-analyze-status" class="status-message" hidden></div>
+        <div id="art-analysis-results" hidden>
+          <h3>Artwork Analysis</h3>
+          <div class="analysis-grid" id="art-analysis-fields"></div>
+        </div>
+      </section>
+
+      <!-- Step 3: Timeline -->
+      <section id="art-step-timeline" class="step" hidden>
+        <div class="step-header">
+          <span class="step-number">3</span>
+          <h2>Overlay Timeline</h2>
+        </div>
+        <div id="art-timeline-bar" class="timeline-bar"></div>
+        <div id="art-callout-editor" class="callout-editor"></div>
+        <div class="music-section">
+          <h3>Background Music</h3>
+          <div class="music-controls">
+            <label class="radio-label">
+              <input type="radio" name="art-music" value="default" checked>
+              <span>Luxury of Wisdom — DJ Ronaldo</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="art-music" value="custom">
+              <span>Upload custom track</span>
+            </label>
+            <input type="file" id="art-music-input" accept=".mp3,.wav,.m4a" hidden>
+            <span id="art-music-filename" class="music-filename"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 4: Render -->
+      <section id="art-step-render" class="step" hidden>
+        <div class="step-header">
+          <span class="step-number">4</span>
+          <h2>Render</h2>
+        </div>
+        <button id="art-btn-render" class="btn btn-primary btn-large">Render Final Video</button>
+        <div id="art-render-progress" hidden>
+          <div class="progress-stages">
+            <div class="stage" id="art-stage-overlays">
+              <span class="stage-label">Overlays</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+            <div class="stage" id="art-stage-intro">
+              <span class="stage-label">Intro</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+            <div class="stage" id="art-stage-composite">
+              <span class="stage-label">Composite</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+          </div>
+          <p id="art-render-status-text" class="status-message"></p>
+        </div>
+        <div id="art-download-section" hidden>
+          <a id="art-download-link" class="btn btn-primary btn-large" download>Download Final Video</a>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB 3: PRODUCT VIDEO GENERATOR                               -->
+    <!-- ============================================================ -->
+    <div id="tab-product" class="tab-panel">
+
+      <!-- Step 1: Upload Images -->
+      <section class="step active">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h2>Upload Product Images</h2>
+        </div>
+        <div class="pv-upload-area" id="pv-uploadArea">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <p>Drop images here or click to browse</p>
+          <p class="hint">JPG, PNG, GIF &bull; Multiple files &bull; Drag to reorder</p>
+        </div>
+        <input type="file" id="pv-imageInput" multiple accept="image/*" hidden>
+        <div class="pv-image-preview" id="pv-imagePreview"></div>
+      </section>
+
+      <!-- Step 2: Video & Overlay Settings -->
+      <section class="step active">
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <h2>Video Settings</h2>
+        </div>
+        <div class="pv-settings-grid">
+          <div class="pv-setting-group">
+            <label for="pv-aspectRatio">Aspect Ratio</label>
+            <select id="pv-aspectRatio">
+              <option value="3:4" selected>3:4 - Mobile (Recommended)</option>
+              <option value="9:16">9:16 - Full Screen Mobile</option>
+              <option value="4:5">4:5 - Instagram Portrait</option>
+              <option value="1:1">1:1 - Square</option>
+              <option value="4:3">4:3 - Standard</option>
+              <option value="16:9">16:9 - Widescreen</option>
+            </select>
+            <span class="pv-help-text">3:4 is optimal for mobile eBay buyers</span>
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-imageDuration">Duration per Image</label>
+            <select id="pv-imageDuration">
+              <option value="1">1 sec — Fast</option>
+              <option value="2" selected>2 sec — Normal</option>
+              <option value="3">3 sec — Comfortable</option>
+              <option value="4">4 sec — Slow</option>
+              <option value="5">5 sec — Very Slow</option>
+            </select>
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-transitionStyle">Transition Style</label>
+            <select id="pv-transitionStyle">
+              <option value="random" selected>Random — Mix of all</option>
+              <option value="fade">Fade</option>
+              <option value="slide">Slide</option>
+              <option value="zoom">Ken Burns — Pan & Zoom</option>
+              <option value="topToBottom">Top to Bottom</option>
+              <option value="leftToRight">Left to Right</option>
+              <option value="diagonalPan">Diagonal</option>
+              <option value="rotateZoom">Rotate & Zoom</option>
+              <option value="threeStage">Three Stage</option>
+            </select>
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-videoQuality">Quality</label>
+            <select id="pv-videoQuality">
+              <option value="high" selected>High — 1080p</option>
+              <option value="medium">Medium — 720p</option>
+              <option value="low">Low — 480p</option>
+            </select>
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-backgroundColor">Background Color</label>
+            <input type="color" id="pv-backgroundColor" value="#000000">
+          </div>
+        </div>
+
+        <div class="drop-zone-label" style="margin-top: 1.5rem;">Sales Overlays</div>
+        <div class="pv-settings-grid" style="margin-top: 0.5rem;">
+          <div class="pv-setting-group">
+            <label for="pv-titleText">Product Title</label>
+            <input type="text" id="pv-titleText" placeholder="e.g. Vintage Collection">
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-priceText">Price Display</label>
+            <input type="text" id="pv-priceText" placeholder="e.g. $99.99 or 50% OFF">
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-ctaText">Call to Action</label>
+            <select id="pv-ctaText">
+              <option value="">None</option>
+              <option value="BUY IT NOW">BUY IT NOW</option>
+              <option value="BID NOW">BID NOW</option>
+              <option value="FREE SHIPPING">FREE SHIPPING</option>
+              <option value="MAKE AN OFFER">MAKE AN OFFER</option>
+              <option value="ONLY 1 LEFT">ONLY 1 LEFT</option>
+              <option value="RARE FIND">RARE FIND</option>
+              <option value="AUTHENTICITY GUARANTEED">AUTHENTICITY GUARANTEED</option>
+              <option value="AUCTION ENDING SOON">AUCTION ENDING SOON</option>
+              <option value="SHIPS TODAY">SHIPS TODAY</option>
+              <option value="TOP RATED SELLER">TOP RATED SELLER</option>
+            </select>
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-textPosition">Text Position</label>
+            <select id="pv-textPosition">
+              <option value="top">Top</option>
+              <option value="center">Center</option>
+              <option value="bottom" selected>Bottom</option>
+              <option value="split">Top & Bottom</option>
+            </select>
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-textStyle">Text Style</label>
+            <select id="pv-textStyle">
+              <option value="modern" selected>Modern Clean</option>
+              <option value="bold">Bold Impact</option>
+              <option value="elegant">Elegant</option>
+              <option value="neon">Neon Glow</option>
+              <option value="vintage">Vintage</option>
+            </select>
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-salesEffect">Sales Effects</label>
+            <select id="pv-salesEffect">
+              <option value="none">None</option>
+              <option value="flash">Flash Sale</option>
+              <option value="countdown">Countdown Timer</option>
+              <option value="pulse">Pulsing Badge</option>
+              <option value="sparkle">Sparkle Effect</option>
+              <option value="zoom">Zoom Emphasis</option>
+            </select>
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-watermark">Store Name</label>
+            <input type="text" id="pv-watermark" placeholder="Your eBay Store">
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-ebayBadge">Seller Badge</label>
+            <select id="pv-ebayBadge">
+              <option value="">None</option>
+              <option value="top-rated">Top Rated Plus</option>
+              <option value="power-seller">PowerSeller</option>
+              <option value="trusted">Trusted Seller</option>
+              <option value="returns">Free Returns</option>
+              <option value="money-back">Money Back Guarantee</option>
+            </select>
+          </div>
+          <div class="pv-setting-group">
+            <label for="pv-listingType">Listing Type</label>
+            <select id="pv-listingType">
+              <option value="fixed">Buy It Now</option>
+              <option value="auction">Auction</option>
+              <option value="both">Auction + Buy It Now</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button class="btn btn-primary btn-large" id="pv-createVideoBtn" disabled>Create Video</button>
+          <button class="btn btn-large" id="pv-resetBtn" style="background: rgba(201,162,39,0.15); color: var(--gold); border: 1px solid rgba(201,162,39,0.3);">Start Over</button>
+        </div>
+      </section>
+
+      <!-- Step 3: Rendering / Download -->
+      <section class="step active" id="pv-renderStep" hidden>
+        <div class="step-header">
+          <span class="step-number">3</span>
+          <h2>Rendering</h2>
+        </div>
+
+        <div class="pv-progress-section" id="pv-progressSection">
+          <p class="status-message loading">Creating your product video...</p>
+          <div class="pv-progress-bar">
+            <div class="pv-progress-fill" id="pv-progressFill" style="width: 0%">0%</div>
+          </div>
+          <p id="pv-progressStatus" class="status-message" style="margin-top: 0.5rem;">Initializing...</p>
+        </div>
+
+        <div class="pv-status-message" id="pv-statusMessage"></div>
+
+        <div class="pv-video-preview-section" id="pv-videoPreviewSection">
+          <div style="text-align: center; margin-top: 1rem;">
+            <video id="pv-videoPreview" controls style="max-width: 100%; max-height: 400px; border-radius: 8px; border: 1px solid rgba(201,162,39,0.2);"></video>
+          </div>
+          <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.25rem;">
+            <button class="btn btn-primary btn-large" id="pv-downloadBtn">Download WebM</button>
+            <button class="btn btn-large" id="pv-createAnotherBtn" style="background: rgba(201,162,39,0.15); color: var(--gold); border: 1px solid rgba(201,162,39,0.3);">Create Another</button>
+          </div>
+        </div>
+      </section>
+
+      <canvas id="pv-videoCanvas"></canvas>
+    </div>
+
   </main>
 
   <footer>
     <p>Gauntlet Gallery &mdash; JJ Shay</p>
   </footer>
 
+  <!-- Tab switching -->
+  <script>
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+  </script>
+
+  <!-- Music video JS (operates on non-prefixed IDs in tab-music) -->
+  <script src="js/app-music.js"></script>
+  <!-- Art video JS (operates on art- prefixed IDs in tab-art) -->
   <script src="js/app.js"></script>
+  <!-- Product video JS (operates on pv- prefixed IDs in tab-product) -->
+  <script src="js/app-product.js"></script>
 </body>
 </html>
