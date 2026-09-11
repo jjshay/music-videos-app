@@ -1,5 +1,10 @@
 # Music Video Creator
 
+<!-- portfolio-navigation:start -->
+[Project brief](docs/PROJECT_BRIEF.md) · [Structured project record](project.json) · [Portfolio](https://github.com/jjshay)
+
+<!-- portfolio-navigation:end -->
+
 > Turn raw art-listing clips into branded, beat-synced music videos — Claude Vision writes the overlays, FFmpeg cuts to the beat, and the result ships in Gauntlet Gallery's house style.
 
 ## Overview

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "name": "music-videos-app",
+  "title": "Music Video Creator",
+  "category": "Creative tooling",
+  "summary": "Branded listing videos need coordinated clip selection, text, transitions, and music timing.",
+  "status": "Source available; runtime not revalidated in this documentation review",
+  "visibility": "public",
+  "reviewed_on": "2026-09-11",
+  "reviewed_commit": "fb63740d6987b37521b6ad45276c8e6b04088aa5",
+  "architecture": "Upload or clip intake \u2192 frame analysis \u2192 beat detection \u2192 timeline assembly \u2192 branded FFmpeg render.",
+  "evidence": [
+    {
+      "path": "src/services/beatDetector.js",
+      "role": "Implementation component supporting the data flow described above."
+    },
+    {
+      "path": "src/services/musicVideoCompositor.js",
+      "role": "Implementation component supporting the data flow described above."
+    },
+    {
+      "path": "src/services/claudeVision.js",
+      "role": "Implementation component supporting the data flow described above."
+    }
+  ],
+  "validation": "Repository tree and referenced source reviewed. Existing application tests, hosted deployments, paid providers, and external mutations were not re-run in this documentation review.",
+  "limitations": "Deterministic compositing makes edits repeatable; generated descriptions and timing still need exported-media review.",
+  "next_improvement": "Record a reproducible render fixture and verify audio, overlays, duration, and recovery after a failed provider call.",
+  "related_repositories": [
+    "ArtPrint",
+    "airdrop-processor",
+    "art-crop-system",
+    "art-video-project",
+    "handwriting-analysis"
+  ]
+}
